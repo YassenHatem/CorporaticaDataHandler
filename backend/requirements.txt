@@ -1,0 +1,11 @@
+# backend/requirements.txt
+flask
+pandas
+numpy
+scikit-learn
+opencv-python
+Pillow
+nltk
+textblob
+flask_pymongo
+pydantic
