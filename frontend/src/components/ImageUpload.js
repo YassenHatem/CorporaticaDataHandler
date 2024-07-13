@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../services/api';
+import { motion } from 'framer-motion';
 
 const ImageUpload = () => {
   const [images, setImages] = useState([]);
@@ -19,7 +20,7 @@ const ImageUpload = () => {
     formData.append('images', selectedFile);
 
     try {
-      const response = await axios.post('http://127.0.0.1:5000/images/upload', formData, {
+      await api.post('/images/upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -33,9 +34,8 @@ const ImageUpload = () => {
 
   const fetchHistogram = async (filename) => {
     try {
-      const response = await axios.get(`http://127.0.0.1:5000/images/histogram/${filename}`);
-      console.log(response.request.responseURL)
-      setHistogramPath(response.request.responseURL); // Use the response URL
+      const response = await api.get(`/images/histogram/${filename}`);
+      setHistogramPath(response.request.responseURL);
     } catch (error) {
       console.error('Error fetching histogram:', error);
     }
@@ -43,7 +43,7 @@ const ImageUpload = () => {
 
   const fetchSegmentationMask = async (filename) => {
     try {
-      const response = await axios.get(`http://127.0.0.1:5000/images/segmentation/${filename}`);
+      const response = await api.get(`/images/segmentation/${filename}`);
       setSegmentationMask(response.request.responseURL);
     } catch (error) {
       console.error('Error fetching segmentation mask:', error);
@@ -52,7 +52,7 @@ const ImageUpload = () => {
 
   const handleResize = async (filename) => {
     try {
-      const response = await axios.post('http://127.0.0.1:5000/images/resize', {
+      const response = await api.post('/images/resize', {
         filename,
         width: parseInt(resizeParams.width),
         height: parseInt(resizeParams.height),
@@ -65,7 +65,7 @@ const ImageUpload = () => {
 
   const handleCrop = async (filename) => {
     try {
-      const response = await axios.post('http://127.0.0.1:5000/images/crop', {
+      const response = await api.post('/images/crop', {
         filename,
         left: parseInt(cropParams.left),
         top: parseInt(cropParams.top),
@@ -80,7 +80,7 @@ const ImageUpload = () => {
 
   const handleConvert = async (filename) => {
     try {
-      const response = await axios.post('http://127.0.0.1:5000/images/convert', {
+      const response = await api.post('/images/convert', {
         filename,
         format,
       });
@@ -91,18 +91,31 @@ const ImageUpload = () => {
   };
 
   return (
-    <div>
-      <input type="file" onChange={handleFileChange} />
-      <button onClick={handleUpload}>Upload Image</button>
+    <div className="container mx-auto p-4">
+      <div className="mb-4">
+        <input type="file" onChange={handleFileChange} />
+        <button onClick={handleUpload} className="ml-2 bg-blue-500 text-white p-2 rounded">
+          Upload Image
+        </button>
+      </div>
 
-      <div>
-        <h2>Uploaded Images</h2>
+      <motion.div
+        className="uploaded-images"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+      >
+        <h2 className="text-xl font-bold">Uploaded Images</h2>
         <ul>
           {images.map((image, index) => (
-            <li key={index}>
+            <li key={index} className="mb-2">
               {image.filename}
-              <button onClick={() => fetchHistogram(image.filename)}>Get Histogram</button>
-              <button onClick={() => fetchSegmentationMask(image.filename)}>Get Segmentation Mask</button>
+              <button onClick={() => fetchHistogram(image.filename)} className="ml-2 bg-green-500 text-white p-1 rounded">
+                Get Histogram
+              </button>
+              <button onClick={() => fetchSegmentationMask(image.filename)} className="ml-2 bg-purple-500 text-white p-1 rounded">
+                Get Segmentation Mask
+              </button>
               <div>
                 <input
                   type="number"
@@ -116,7 +129,9 @@ const ImageUpload = () => {
                   value={resizeParams.height}
                   onChange={(e) => setResizeParams({ ...resizeParams, height: e.target.value })}
                 />
-                <button onClick={() => handleResize(image.filename)}>Resize</button>
+                <button onClick={() => handleResize(image.filename)} className="ml-2 bg-yellow-500 text-white p-1 rounded">
+                  Resize
+                </button>
               </div>
               <div>
                 <input
@@ -143,32 +158,46 @@ const ImageUpload = () => {
                   value={cropParams.bottom}
                   onChange={(e) => setCropParams({ ...cropParams, bottom: e.target.value })}
                 />
-                <button onClick={() => handleCrop(image.filename)}>Crop</button>
+                <button onClick={() => handleCrop(image.filename)} className="ml-2 bg-red-500 text-white p-1 rounded">
+                  Crop
+                </button>
               </div>
               <div>
                 <select value={format} onChange={(e) => setFormat(e.target.value)}>
                   <option value="JPEG">JPEG</option>
                   <option value="PNG">PNG</option>
                 </select>
-                <button onClick={() => handleConvert(image.filename)}>Convert</button>
+                <button onClick={() => handleConvert(image.filename)} className="ml-2 bg-indigo-500 text-white p-1 rounded">
+                  Convert
+                </button>
               </div>
             </li>
           ))}
         </ul>
-      </div>
+      </motion.div>
 
       {histogramPath && (
-        <div>
-          <h2>Color Histogram</h2>
-          <img src={`${histogramPath}`} alt="Histogram" />
-        </div>
+        <motion.div
+          className="histogram"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          <h2 className="text-xl font-bold">Color Histogram</h2>
+          <img src={histogramPath} alt="Histogram" />
+        </motion.div>
       )}
 
       {segmentationMask && (
-        <div>
-          <h2>Segmentation Mask</h2>
+        <motion.div
+          className="segmentation-mask"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          <h2 className="text-xl font-bold">Segmentation Mask</h2>
           <img src={`${segmentationMask}`} alt="Segmentation Mask" />
-        </div>
+        </motion.div>
       )}
     </div>
   );
