@@ -1,10 +1,9 @@
-
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const TabularData = () => {
   const [data, setData] = useState([]);
-  const [formData, setFormData] = useState({_id: '', name: '', value: '' });
+  const [formData, setFormData] = useState({ name: '', value: '' });
 
   useEffect(() => {
     fetchData();
@@ -22,12 +21,21 @@ const TabularData = () => {
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
-    if (formData._id) {
-      await axios.put('http://127.0.0.1:5000/tabular/update', formData);
+    console.log(formData)
+    if (formData.id) {
+      await axios.put('http://127.0.0.1:5000/tabular/update', formData, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
     } else {
-      await axios.post('http://127.0.0.1:5000/tabular/create', formData);
+      await axios.post('http://127.0.0.1:5000/tabular/create', formData, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
     }
-    setFormData({ _id: '', name: '', value: '' });
+    setFormData({ name: '', value: '' });
     fetchData();
   };
 
@@ -36,7 +44,13 @@ const TabularData = () => {
   };
 
   const handleDelete = async (id) => {
-    await axios.delete('http://127.0.0.1:5000/tabular/delete', formData);
+    console.log(id)
+    await axios.delete('http://127.0.0.1:5000/tabular/delete', {
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      data: { _id: id }
+    });
     fetchData();
   };
 
@@ -71,12 +85,12 @@ const TabularData = () => {
         </thead>
         <tbody>
           {data.map((record) => (
-            <tr key={record._id}>
+            <tr key={record.id}>
               <td>{record.name}</td>
               <td>{record.value}</td>
               <td>
                 <button onClick={() => handleEdit(record)}>Edit</button>
-                <button onClick={() => handleDelete(record)}>Delete</button>
+                <button onClick={() => handleDelete(record.id)}>Delete</button>
               </td>
             </tr>
           ))}

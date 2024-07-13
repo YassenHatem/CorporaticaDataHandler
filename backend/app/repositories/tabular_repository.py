@@ -1,6 +1,5 @@
 from .. import mongo
 from ..models.tabular_model import TabularRecord
-from bson.objectid import ObjectId
 
 class TabularRepository:
     """
@@ -24,6 +23,16 @@ class TabularRepository:
         results = mongo.db.tabular.find(query)
         return [TabularRecord(**result) for result in results]
 
+    def find_one(self, query):
+        """
+        Finds records in the tabular collection matching the query.
+
+        :param query: Dictionary representing the query conditions.
+        :return: TabularRecord instances matching the query.
+        """
+        return mongo.db.tabular.find_one(query)
+
+
     def find_all(self):
         """
         Retrieves all records from the tabular collection.
@@ -45,14 +54,14 @@ class TabularRepository:
         """
         Updates a single record in the tabular collection.
 
-        :param record: TabularRecord instance with updated data.
+        :param record: TabularRecord dictionary with updated data.
         """
-        mongo.db.tabular.update_one({'_id': ObjectId(record.id)}, {"$set": record.dict(by_alias=True)}, upsert=False)
+        mongo.db.tabular.update_one({'_id': record.get("id")}, {"$set": record}, upsert=False)
 
-    def delete_one(self, record):
+    def delete_one(self, record_id):
         """
         Deletes a single record from the tabular collection.
 
-        :param record: TabularRecord instance to be deleted.
+        :param record_id: TabularRecord instance id to be deleted.
         """
-        mongo.db.tabular.delete_one({'_id': ObjectId(record.id)})
+        mongo.db.tabular.delete_one({'_id': record_id})

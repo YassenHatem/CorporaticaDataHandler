@@ -2,6 +2,7 @@ from ..repositories.tabular_repository import TabularRepository
 from ..models.tabular_model import TabularRecord
 from ..utils.data_processing import process_tabular, compute_statistics
 import pandas as pd
+import logging
 
 class TabularService:
     """
@@ -70,8 +71,7 @@ class TabularService:
         :param data: Dictionary containing the updated data for the record.
         :return: Response message indicating the status of the operation.
         """
-        record = TabularRecord(**data)
-        self.repository.update_one(record)
+        self.repository.update_one(data)
         return {"message": "Data updated successfully"}
 
     def delete_record(self, data):
@@ -81,6 +81,7 @@ class TabularService:
         :param data: Dictionary containing the identifier of the record to be deleted.
         :return: Response message indicating the status of the operation.
         """
-        record = TabularRecord(**data)
-        self.repository.delete_one(record)
+        record_id = data.get("_id")
+        logging.info(data)
+        self.repository.delete_one(record_id)
         return {"message": "Data deleted successfully"}

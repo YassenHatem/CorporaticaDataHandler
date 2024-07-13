@@ -9,3 +9,4 @@ textblob
 flask_pymongo
 pydantic
 flask-cors
+matplotlib
