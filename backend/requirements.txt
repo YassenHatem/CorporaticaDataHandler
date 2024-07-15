@@ -10,3 +10,5 @@ flask_pymongo
 pydantic
 flask-cors
 matplotlib
+rake_nltk
+sumy

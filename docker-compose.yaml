@@ -9,7 +9,7 @@ services:
     volumes:
       - ./backend:/app
     environment:
-      - MONGO_URI=mongodb://mongo:27017/myDatabase
+      - MONGO_URI=mongodb://mongo:27017/dataHandler
     depends_on:
       - mongo
 
